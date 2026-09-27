@@ -1,9 +1,17 @@
+import logging
 import os
 
 import psycopg2
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Platform Engineer Assignment",
@@ -23,10 +31,6 @@ def root():
 def health():
     """
     Application and database health check.
-
-    Returns:
-        200 when application and database are healthy.
-        503 when database connectivity fails.
     """
 
     try:
@@ -47,6 +51,11 @@ def health():
         }
 
     except Exception as exc:
+        logger.error(
+            "Database health check failed: %s",
+            exc
+        )
+
         return JSONResponse(
             status_code=503,
             content={
